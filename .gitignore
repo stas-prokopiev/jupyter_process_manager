@@ -1,3 +1,7 @@
+# My files
+jupyter_notebooks/*
+
+
 # Temporary and binary files
 *~
 *.py[cod]
