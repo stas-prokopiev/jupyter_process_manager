@@ -13,7 +13,6 @@ from IPython.display import clear_output
 from IPython.display import display
 from IPython import get_ipython
 from IPython.display import HTML
-from tqdm.auto import tqdm
 from tabulate import tabulate
 from yaspin import yaspin
 

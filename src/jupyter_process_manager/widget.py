@@ -13,7 +13,6 @@ from ipywidgets import HBox, VBox
 from char import char
 from IPython.display import clear_output
 from IPython.display import display
-from tqdm.auto import tqdm
 from tabulate import tabulate
 from yaspin import yaspin
 
@@ -159,7 +158,7 @@ def create_jupyter_widget(process_manager_obj):
     # list_hboxes.append(HBox([ipywidgets.HTML("<hr>")], layout=HBOX_LAYOUT))
     list_hboxes.append(HBox([ipywidgets.HTML("<h2>Output:</h2>")]))
     list_hboxes.append(HBox([OUTPUT]))
-    list_hboxes.append(HBox([ipywidgets.HTML("<br>")])) 
+    list_hboxes.append(HBox([ipywidgets.HTML("<br>")]))
     VBOX_APP_GUI.children = list_hboxes
     #####
     return VBOX_APP_GUI
