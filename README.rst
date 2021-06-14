@@ -68,7 +68,7 @@ Usual print output
     process_manager.wait_till_all_processes_are_over(int_seconds_step=2)
 
 
-.. image:: images/1.png
+.. image:: images/1.PNG
 
 
 Show processes output as widget
@@ -81,7 +81,7 @@ Show processes output as widget
         int_max_processes_to_show=20
     )
 
-.. image:: images/2.png
+.. image:: images/2.PNG
 
 JupyterProcessesManager arguments
 --------------------------------------------------------------------------------------------------
