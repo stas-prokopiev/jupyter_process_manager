@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jupyter_process_manager"
-version = "0.1.1"
+version = "0.1.2"
 description = "python package with widget to simplify work with many processes in jupyter"
 authors = ["stanislav <stas.prokopiev@gmail.com>"]
 license = "MIT"
