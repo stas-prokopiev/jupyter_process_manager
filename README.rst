@@ -39,10 +39,13 @@ Installation via pip:
 Usage examples
 ===================================================================
 
-Lets say that you want to run many processes with different arguments for the function below
+| Lets say that you want to run some function defined in file **test_function.py**
+| with different arguments as separate processes and have control over them.
+
 
 .. code-block:: python
 
+    # In the file test_function.py
     def test_just_wait(int_seconds):
         for int_num in range(int_seconds):
             print(int_num)
@@ -53,6 +56,7 @@ Then to run it you just need to do the following:
 .. code-block:: python
 
     from jupyter_process_manager import JupyterProcessesManager
+    from .test_function import test_just_wait
     # Create an object which will be handling processes
     process_manager = JupyterProcessesManager(".")
 
@@ -62,6 +66,7 @@ Then to run it you just need to do the following:
 
 All the processes were started and now you can check what is happening with them
 
+**WARNING: Please do NOT try to use functions defined inside jupyter notebook, they won't work.**
 
 Show processes output as widget
 --------------------------------------------------------------------------------------------------
