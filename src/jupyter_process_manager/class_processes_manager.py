@@ -1,25 +1,26 @@
 """Main module with class which helps in handing many processes"""
 # Standard library imports
 import os
-import sys
 import logging
 from collections import OrderedDict
 from time import sleep
 import datetime
 
 # Third party imports
-from char import char
 from IPython.display import clear_output
 from IPython.display import display
 from IPython import get_ipython
 from IPython.display import HTML
 from tabulate import tabulate
 from yaspin import yaspin
+from char import char
 
 # Local imports
 from .class_one_process import OneProcess
 from .other import timedelta_nice_format
 from . import widget
+
+LOGGER = logging.getLogger(__name__)
 
 
 class JupyterProcessesManager(object):
@@ -67,7 +68,9 @@ class JupyterProcessesManager(object):
 
     @char
     def debug_run_of_1_function(self, func_to_process, *args, **kwargs):
-        """"""
+        """
+        Run given function in the current process to check that it is runnable
+        """
         new_process = OneProcess(self.str_dir_for_output)
         new_process.debug_run_of_the_func(func_to_process, *args, **kwargs)
         self.dict_all_processes_by_id[new_process.int_process_id] = new_process
@@ -79,7 +82,13 @@ class JupyterProcessesManager(object):
             int_seconds_step=10,
             int_max_processes_to_show=20
     ):
-        """"""
+        """Wait while processes are running and print information during it
+
+        Args:
+            int_seconds_step (int,): Seconds to update processes info
+            int_max_processes_to_show (int): \
+                Max number of processes to show at once in the table
+        """
         clear_output(wait=True)
         self.print_info_about_running_processes(
             int_max_processes_to_show=int_max_processes_to_show)
@@ -87,9 +96,9 @@ class JupyterProcessesManager(object):
             while True:
                 if not self.dict_alive_processes_by_id:
                     break
-                with yaspin() as sp:
+                with yaspin() as spinner_obj:
                     for i in range(int_seconds_step):
-                        sp.text = "Updating in {} seconds".format(
+                        spinner_obj.text = "Updating in {} seconds".format(
                             int_seconds_step - i)
                         sleep(1)
                 clear_output(wait=True)
@@ -104,7 +113,7 @@ class JupyterProcessesManager(object):
 
     @char
     def terminate_all_alive_processes(self):
-        """"""
+        """Terminate all alive processes"""
         print("Terminating all alive processes")
         for process_num in list(self.dict_alive_processes_by_id):
             print("---> Terminate process: ", process_num + 1)
@@ -120,10 +129,16 @@ class JupyterProcessesManager(object):
             int_seconds_step=10,
             int_max_processes_to_show=20
     ):
-        """"""
+        """Show jupyter widget to interact with running processes
+
+        Args:
+            int_seconds_step (int,): Seconds to update processes info
+            int_max_processes_to_show (int): \
+                Max number of processes to show at once in the table
+        """
         clear_output(wait=True)
-        APP_GUI = widget.create_jupyter_widget(self)
-        display(APP_GUI)
+        app_gui = widget.create_jupyter_widget(self)
+        display(app_gui)
         with widget.OUTPUT_PROCESSES_CONDITIONS:
             self.print_info_about_running_processes(
                 int_max_processes_to_show=int_max_processes_to_show)
@@ -131,8 +146,8 @@ class JupyterProcessesManager(object):
             while True:
                 if not self.dict_alive_processes_by_id:
                     break
-                for i in range(int_seconds_step):
-                    sleep(1)
+                for _ in range(int_seconds_step):
+                    sleep(0.2)
                     get_ipython().kernel.do_one_iteration()
                 widget.OUTPUT_PROCESSES_CONDITIONS.clear_output(wait=True)
                 with widget.OUTPUT_PROCESSES_CONDITIONS:
@@ -147,14 +162,14 @@ class JupyterProcessesManager(object):
 
     @char
     def print_info_about_running_processes(self, int_max_processes_to_show=20):
-        """"""
+        """Print information string about current processes"""
         display(HTML("<h2>Processes conditions:</h2>"))
-
         # print("Conditions of the processes:")
         if self.dt_processes_started_at:
             timedelta = datetime.datetime.now() - self.dt_processes_started_at
             print("Working for:", timedelta_nice_format(timedelta))
-        self.print_table_with_conditions(int_max_processes_to_show=20)
+        self.print_table_with_conditions(
+            int_max_processes_to_show=int_max_processes_to_show)
         print(
             "ALIVE PROCESSES: ",
             len(self.dict_alive_processes_by_id), "/",
@@ -162,7 +177,7 @@ class JupyterProcessesManager(object):
 
     @char
     def print_table_with_conditions(self, int_max_processes_to_show=20):
-        """"""
+        """Print table with processes conditions"""
         list_list_processes_info = []
         list_headers = ["Process Id", "Status", "Runtime"]
         for process_num in list(self.dict_all_processes_by_id):
@@ -195,7 +210,7 @@ class JupyterProcessesManager(object):
             list_list_processes_info, headers=list_headers, tablefmt="pretty"))
 
     def _delete_all_previous_outputs(self):
-        """Delete outputs of previous processes"""
+        """Delete outputs of all previous processes"""
         for str_filename in os.listdir(self.str_dir_for_output):
             str_file_path = os.path.join(self.str_dir_for_output, str_filename)
             if not os.path.isfile(str_file_path):

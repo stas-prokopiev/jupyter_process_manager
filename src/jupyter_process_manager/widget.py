@@ -1,138 +1,164 @@
 """Module with functions to handle all ipywidget stuff"""
 # Standard library imports
-import os
-import sys
-import logging
-from collections import OrderedDict
-from time import sleep
-import datetime
 
 # Third party imports
 import ipywidgets
-from ipywidgets import HBox, VBox
-from char import char
-from IPython.display import clear_output
-from IPython.display import display
-from tabulate import tabulate
-from yaspin import yaspin
+from ipywidgets import HBox
+from ipywidgets import VBox
 
 # Local imports
-from .class_one_process import OneProcess
-from .other import timedelta_nice_format
 
 MAIN_VBOX_LAYOUT = dict(
-    # display="flex",
     width="100%",
     justify_content="center",
     align_self="center",
-    # border='dashed 1px',
     padding="0px 0px 10px 0px"
 
 )
 
 HBOX_LAYOUT = dict(
-    # display="flex", # Items will be put one after another
     flex_wrap="wrap",
-        flex="1 1 auto",
+    flex="1 1 auto",
     width="80%",
     justify_content="center",
     align_self="center",
+    padding="10px 0px 0px 0px"
 )
 
-VBOX_APP_GUI = ipywidgets.VBox()
-VBOX_MAIN_GUI = ipywidgets.VBox(layout=MAIN_VBOX_LAYOUT)
-VBOX_CHOOSE_OUTPUT = ipywidgets.VBox()
+VBOX_APP_GUI = VBox()
+VBOX_MAIN_GUI = VBox(layout=MAIN_VBOX_LAYOUT)
+VBOX_CHOOSE_OUTPUT = VBox()
+VBOX_CHOOSE_OUTPUT_TYPE = VBox()
+VBOX_ONE_PROCESS_CHOOSE_OUTPUT = VBox()
 
-VBOX_CHOOSE_OUTPUT_TYPE = ipywidgets.VBox()
+HBOX_BUTTONS_TO_STOP_PROCESSES = HBox()
 
-VBOX_ONE_PROCESS_CHOOSE_OUTPUT = ipywidgets.VBox()
+
 OUTPUT_PROCESSES_CONDITIONS = ipywidgets.Output()
 OUTPUT = ipywidgets.Output()
 BUTTONS_CHOOSE_PROCESS = ipywidgets.ToggleButtons()
-BUTTONS_CHOOSE_OUTPUT_TYPE = ipywidgets.ToggleButtons(
-    options=["STDOUT", "STDERR"])
-BUTTON_CLEAR_OUTPUT = ipywidgets.Button(
-    description='clear',
-    button_style='info', # 'success', 'info', 'warning', 'danger' or ''
-)
 WIDGET_LAST_LINES_TO_GET = ipywidgets.IntText(100)
 
 
-
-# Create global events
-BUTTON_CLEAR_OUTPUT.on_click(lambda _: OUTPUT.clear_output())
-BUTTONS_CHOOSE_OUTPUT_TYPE.observe(
-    lambda _:update_vbox_choose_output_type(), names='value')
-
-
-def update_vbox_choose_output_type():
-    """"""
-    list_hboxes = []
-    if BUTTONS_CHOOSE_OUTPUT_TYPE.value == "STDOUT":
-        WIDGET_LAST_LINES_TO_GET.disabled = False
-    else:
-        WIDGET_LAST_LINES_TO_GET.disabled = True
-    list_hboxes.append(HBox([
-        ipywidgets.HTML("<h3>Choose output type:</h3>")],
-        layout=HBOX_LAYOUT))
-    list_hboxes.append(HBox([BUTTONS_CHOOSE_OUTPUT_TYPE], layout=HBOX_LAYOUT))
-    wid_label = ipywidgets.Label("Last lines to get:")
-    list_hboxes.append(
-        HBox([wid_label, WIDGET_LAST_LINES_TO_GET], layout=HBOX_LAYOUT))
-    VBOX_CHOOSE_OUTPUT_TYPE.children = list_hboxes
-
-
-
-
 def update_one_process_choose_output(process_manager_obj):
-    """"""
-    list_hboxes = []
+    """Create all widgets with buttons to show output
 
-    update_vbox_choose_output_type()
-    list_hboxes.append(VBOX_CHOOSE_OUTPUT_TYPE)
-
-
-    int_chosen_process = BUTTONS_CHOOSE_PROCESS.value
-    process_obj = process_manager_obj.dict_all_processes_by_id[int_chosen_process]
-
-
-
-
-    button_show_output = ipywidgets.Button(
-        description='Show output',
+    Args:
+        process_manager_obj (JupyterProcessesManager): Processes manager
+    """
+    list_buttons = []
+    #####
+    # BUTTON STDOUT
+    button_show_stdout = ipywidgets.Button(
+        description='Show process STDOUT',
         button_style='success', # 'success', 'info', 'warning', 'danger' or ''
+        layout={"width": "200px"}
     )
-    list_hboxes.append(HBox([ipywidgets.HTML("<br>")]))
-    list_hboxes.append(HBox(
-        [button_show_output, BUTTON_CLEAR_OUTPUT], layout=HBOX_LAYOUT))
-
-    def on_click(_):
+    def on_click_stdout(_):
         """"""
-        OUTPUT.clear_output()
-        if BUTTONS_CHOOSE_OUTPUT_TYPE.value == "STDOUT":
-            str_output = process_obj.get_last_n_lines_of_stdout(
-                int_last_lines=WIDGET_LAST_LINES_TO_GET.value)
-        else:
-            str_output = process_obj.get_last_error_msg()
+        OUTPUT.clear_output(wait=True)
+        int_chosen_process = BUTTONS_CHOOSE_PROCESS.value
+        process_obj = \
+            process_manager_obj.dict_all_processes_by_id[int_chosen_process]
+        str_output = process_obj.get_last_n_lines_of_stdout(
+            int_last_lines=WIDGET_LAST_LINES_TO_GET.value)
         with OUTPUT:
             print(str_output)
+    button_show_stdout.on_click(on_click_stdout)
+    list_buttons.append(button_show_stdout)
+    #####
+    # BUTTON STDERR
+    button_show_stderr = ipywidgets.Button(
+        description='Show LAST ERROR',
+        button_style='info', # 'success', 'info', 'warning', 'danger' or ''
+        layout={"width": "200px"}
+    )
+    def on_click_stderr(_):
+        """"""
+        OUTPUT.clear_output(wait=True)
+        int_chosen_process = BUTTONS_CHOOSE_PROCESS.value
+        process_obj = \
+            process_manager_obj.dict_all_processes_by_id[int_chosen_process]
+        int_errors_happened = len(process_obj.get_list_all_errors())
+        with OUTPUT:
+            print("ERROR found: ", int_errors_happened)
+            if int_errors_happened:
+                str_last_error = process_obj.get_last_error_msg()
+                print("Last error message: ")
+                print(str_last_error)
+    button_show_stderr.on_click(on_click_stderr)
+    list_buttons.append(button_show_stderr)
+    #####
+    # BUTTON STOP PROCESS
+    int_chosen_process = BUTTONS_CHOOSE_PROCESS.value
+    process_obj = \
+        process_manager_obj.dict_all_processes_by_id[int_chosen_process]
+    if process_obj.is_alive():
+        button_stop_process = ipywidgets.Button(
+            description='STOP %d process' % int_chosen_process,
+            button_style='warning',
+            layout={"width": "200px"}
+        )
 
-    button_show_output.on_click(on_click)
+        def on_click_stop_process(_):
+            """"""
+            OUTPUT.clear_output(wait=True)
+            int_chosen_process = BUTTONS_CHOOSE_PROCESS.value
+            process_obj = \
+                process_manager_obj.dict_all_processes_by_id[int_chosen_process]
+            with OUTPUT:
+                print("Stopping process: ", int_chosen_process)
+                process_obj.terminate()
+                print("---> Done. Process %d TERMINATED" % int_chosen_process)
+        button_stop_process.on_click(on_click_stop_process)
+        list_buttons.append(button_stop_process)
+    #####
+    list_hboxes = []
+    list_hboxes.append(
+        HBox(
+            [ipywidgets.HTML("<h3>Process: %d:</h3>" % int_chosen_process)],
+            layout=HBOX_LAYOUT)
+    )
+    wid_label = ipywidgets.Label("Last STDOUT lines to show:")
+    list_hboxes.append(
+        HBox([wid_label, WIDGET_LAST_LINES_TO_GET], layout=HBOX_LAYOUT))
+    list_hboxes.append(HBox(list_buttons, layout=HBOX_LAYOUT))
     VBOX_ONE_PROCESS_CHOOSE_OUTPUT.children = list_hboxes
 
 
 def create_choose_process(process_manager_obj):
-    """"""
-    list_hboxes = []
+    """Create all widgets starting from choose process
 
-    list_hboxes.append(HBox([
-        ipywidgets.HTML("<h3>Choose process to show:</h3>")],
-        layout=HBOX_LAYOUT))
+    Args:
+        process_manager_obj (JupyterProcessesManager): Processes manager
+    """
+    list_hboxes = []
+    # Stop ALL Processes
+    button_stop_all_processes = ipywidgets.Button(
+        description='STOP ALL processes',
+        button_style='warning',
+        layout={"width": "200px"}
+    )
+    def on_click_stop_all_processes(_):
+        """"""
+        OUTPUT.clear_output(wait=True)
+        with OUTPUT:
+            process_manager_obj.terminate_all_alive_processes()
+    button_stop_all_processes.on_click(on_click_stop_all_processes)
+
+    list_hboxes.append(HBox([button_stop_all_processes], layout=HBOX_LAYOUT))
+    #####
+    list_hboxes.append(
+        HBox(
+            [ipywidgets.HTML("<h3>Choose process to show:</h3>")],
+            layout=HBOX_LAYOUT)
+    )
     BUTTONS_CHOOSE_PROCESS.options = list(
         process_manager_obj.dict_all_processes_by_id)
     list_hboxes.append(HBox([BUTTONS_CHOOSE_PROCESS], layout=HBOX_LAYOUT))
     BUTTONS_CHOOSE_PROCESS.observe(
-        lambda _:update_one_process_choose_output(process_manager_obj), names='value')
+        lambda _: update_one_process_choose_output(process_manager_obj),
+        names='value')
     # # Choose which output to show
     update_one_process_choose_output(process_manager_obj)
     list_hboxes.append(VBOX_ONE_PROCESS_CHOOSE_OUTPUT)
@@ -140,11 +166,15 @@ def create_choose_process(process_manager_obj):
 
 
 def create_jupyter_widget(process_manager_obj):
-    """"""
+    """Create all widgets to interact with running processes
+
+    Args:
+        process_manager_obj (JupyterProcessesManager): Processes manager
+    """
     list_hboxes_main = []
     # OUTPUT_PROCESSES_CONDITIONS
-    # list_hboxes_main.append(HBox([ipywidgets.HTML("<h2>Processes conditions:</h2>")], layout=HBOX_LAYOUT))
-    list_hboxes_main.append(HBox([OUTPUT_PROCESSES_CONDITIONS], layout=HBOX_LAYOUT))
+    list_hboxes_main.append(
+        HBox([OUTPUT_PROCESSES_CONDITIONS], layout=HBOX_LAYOUT))
     # Choose which output to show
     create_choose_process(process_manager_obj)
     list_hboxes_main.append(VBOX_CHOOSE_OUTPUT)
@@ -153,9 +183,6 @@ def create_jupyter_widget(process_manager_obj):
     # Add output to application
     list_hboxes = [VBOX_MAIN_GUI]
     # Output to show
-    # list_hboxes.append(HBox([ipywidgets.HTML("<hr>")], layout=HBOX_LAYOUT))
-    # list_hboxes.append(HBox([ipywidgets.HTML("<hr>")], layout=HBOX_LAYOUT))
-    # list_hboxes.append(HBox([ipywidgets.HTML("<hr>")], layout=HBOX_LAYOUT))
     list_hboxes.append(HBox([ipywidgets.HTML("<h2>Output:</h2>")]))
     list_hboxes.append(HBox([OUTPUT]))
     list_hboxes.append(HBox([ipywidgets.HTML("<br>")]))

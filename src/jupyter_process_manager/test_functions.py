@@ -1,9 +1,11 @@
+"""Module with functions to test this package"""
 import warnings
 from time import sleep
 import logging
 
 
 def test_func(int_seconds=3):
+    """Test function 1"""
     if int_seconds == 15:
         raise ValueError("hihi")
     if int_seconds == 20:
@@ -16,5 +18,6 @@ def test_func(int_seconds=3):
 
 
 def test_func2(int_num=1):
-    with open("./%d.txt" % int_num, "w") as f:
-        f.write("hihi")
+    """Test function 2"""
+    with open("./%d.txt" % int_num, "w") as file_handler:
+        file_handler.write("hihi")

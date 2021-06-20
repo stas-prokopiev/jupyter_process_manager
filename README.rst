@@ -41,7 +41,7 @@ Lets say that you want to run many processes with different arguments for the fu
 
 .. code-block:: python
 
-    def test_func(int_seconds):
+    def test_just_wait(int_seconds):
         for int_num in range(int_seconds):
             print(int_num)
             sleep(1)
@@ -54,21 +54,11 @@ Then to run it you just need to do the following:
     # Create an object which will be handling processes
     process_manager = JupyterProcessesManager(".")
 
-    for wait_for_me in range(5, 50, 5):
-        process_manager.add_function_to_processing(test_func, wait_for_me)
+    for seconds_to_wait in range(5, 50, 5):
+        process_manager.add_function_to_processing(test_just_wait, seconds_to_wait)
 
 
 All the processes were started and now you can check what is happening with them
-
-Usual print output
---------------------------------------------------------------------------------------------------
-
-.. code-block:: python
-
-    process_manager.wait_till_all_processes_are_over(int_seconds_step=2)
-
-
-.. image:: images/1.PNG
 
 
 Show processes output as widget
@@ -88,6 +78,18 @@ JupyterProcessesManager arguments
 
 #. **str_dir_for_output**: Directory where to store processes output
 #. **is_to_delete_previous_outputs=True**: Flag If you want to delete outputs for all previous processes in the directory
+
+
+
+Usual print output
+--------------------------------------------------------------------------------------------------
+
+.. code-block:: python
+
+    process_manager.wait_till_all_processes_are_over(int_seconds_step=2)
+
+
+.. image:: images/1.PNG
 
 
 Links

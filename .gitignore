@@ -1,6 +1,7 @@
 # My files
 jupyter_notebooks/*
 TO_DELETE/*
+.ipynb_checkpoints
 
 
 # Temporary and binary files
