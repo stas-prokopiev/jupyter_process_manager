@@ -10,6 +10,9 @@ jupyter_process_manager
     :target: https://github.com/stas-prokopiev/jupyter_process_manager/blob/master/LICENSE.txt
     :alt: GitHub license<space><space>
 
+.. image:: https://travis-ci.org/stas-prokopiev/jupyter_process_manager.svg?branch=master
+    :target: https://travis-ci.org/stas-prokopiev/jupyter_process_manager
+
 .. image:: https://img.shields.io/pypi/v/jupyter_process_manager
    :target: https://img.shields.io/pypi/v/jupyter_process_manager
    :alt: PyPI
