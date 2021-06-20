@@ -36,7 +36,6 @@ Installation via pip:
 
     pip install jupyter_process_manager
 
-
 Usage examples
 ===================================================================
 
