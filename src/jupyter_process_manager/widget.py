@@ -1,4 +1,6 @@
 """Module with functions to handle all ipywidget stuff"""
+from __future__ import print_function
+from __future__ import unicode_literals
 # Standard library imports
 
 # Third party imports

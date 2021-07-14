@@ -1,4 +1,6 @@
 """Module with class for all operations with one process"""
+from __future__ import print_function
+from __future__ import unicode_literals
 # Standard library imports
 import os
 import logging
