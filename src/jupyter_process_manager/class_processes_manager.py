@@ -1,6 +1,5 @@
 """Main module with class which helps in handing many processes"""
 from __future__ import print_function
-from __future__ import unicode_literals
 # Standard library imports
 import os
 import logging

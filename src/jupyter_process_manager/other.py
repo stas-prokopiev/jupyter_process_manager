@@ -1,6 +1,5 @@
 """Module with other small functions"""
 from __future__ import print_function
-from __future__ import unicode_literals
 #  Standard library imports
 
 # Third party imports

@@ -1,6 +1,5 @@
 """Decorators and wrappers to redirect streams for processes"""
 from __future__ import print_function
-from __future__ import unicode_literals
 # Standard library imports
 import sys
 import atexit
