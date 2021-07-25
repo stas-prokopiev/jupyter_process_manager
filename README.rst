@@ -55,14 +55,14 @@ Then to run it you just need to do the following:
 
 .. code-block:: python
 
-    from jupyter_process_manager import JupyterProcessesManager
+    from jupyter_process_manager import JPM
+    # OR from jupyter_process_manager import JupyterProcessManager
     from .test_function import test_just_wait
     # Create an object which will be handling processes
-    process_manager = JupyterProcessesManager(".")
+    process_manager = JPM(".")
 
     for seconds_to_wait in range(5, 50, 5):
         process_manager.add_function_to_processing(test_just_wait, seconds_to_wait)
-
 
 All the processes were started and now you can check what is happening with them
 
@@ -80,13 +80,11 @@ Show processes output as widget
 
 .. image:: images/2.PNG
 
-JupyterProcessesManager arguments
+JPM arguments
 --------------------------------------------------------------------------------------------------
 
 #. **str_dir_for_output**: Directory where to store processes output
 #. **is_to_delete_previous_outputs=True**: Flag If you want to delete outputs for all previous processes in the directory
-
-
 
 Usual print output
 --------------------------------------------------------------------------------------------------
@@ -95,9 +93,15 @@ Usual print output
 
     process_manager.wait_till_all_processes_are_over(int_seconds_step=2)
 
-
 .. image:: images/1.PNG
 
+
+How to Debug
+--------------------------------------------------------------------------------------------------
+
+.. code-block:: python
+
+    debug_run_of_1_function(self, func_to_process, *args, **kwargs)
 
 Links
 =====

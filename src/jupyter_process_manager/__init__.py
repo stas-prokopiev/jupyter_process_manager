@@ -8,7 +8,12 @@ from jupyter_process_manager.class_processes_manager import \
     JupyterProcessesManager
 from . import logger
 
-__all__ = ["JupyterProcessesManager"]
+
+JupyterProcessManager = JupyterProcessesManager
+JPM = JupyterProcessesManager
+
+
+__all__ = ["JupyterProcessesManager", "JupyterProcessManager", "JPM"]
 
 # Create LOGGER for current project
 logger.initialize_project_logger(
