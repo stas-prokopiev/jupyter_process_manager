@@ -46,7 +46,9 @@ Usage examples
 .. code-block:: python
 
     # In the file test_function.py
-    def test_just_wait(int_seconds):
+    def test_just_wait(int_seconds, test_msg=""):
+        if test_msg:
+            print(test_msg)
         for int_num in range(int_seconds):
             print(int_num)
             sleep(1)
@@ -61,8 +63,12 @@ Then to run it you just need to do the following:
     # Create an object which will be handling processes
     process_manager = JPM(".")
 
-    for seconds_to_wait in range(5, 50, 5):
-        process_manager.add_function_to_processing(test_just_wait, seconds_to_wait)
+    for seconds_to_wait in range(5, 30, 5):
+        process_manager.add_function_to_processing(
+            test_just_wait,
+            seconds_to_wait,
+            test_msg="hi" * seconds_to_wait
+        )
 
 All the processes were started and now you can check what is happening with them
 
@@ -101,7 +107,8 @@ How to Debug
 
 .. code-block:: python
 
-    debug_run_of_1_function(self, func_to_process, *args, **kwargs)
+    # arguments are the same as in **add_function_to_processing(...)**
+    process_manager.debug_run_of_1_function(func_to_process, *args, **kwargs)
 
 Links
 =====
