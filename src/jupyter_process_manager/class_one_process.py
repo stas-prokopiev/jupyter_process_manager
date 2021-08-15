@@ -110,7 +110,6 @@ class OneProcess(object):
             return str(rtnsd(float_mem_gbytes, 2)) + " Gb"
         return str(rtnsd(float_mem_mbytes, 2)) + " Mb"
 
-
     def get_how_long_this_process_is_running(self):
         """Get string with duration this process is running"""
         if not self.dt_start_time:
