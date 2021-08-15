@@ -1,6 +1,7 @@
 """Module with class for all operations with one process"""
 from __future__ import print_function
 # Standard library imports
+import sys
 import os
 import logging
 from multiprocessing import Process
@@ -8,10 +9,12 @@ import datetime
 
 # Third party imports
 from local_simple_database import LocalSimpleDatabase
+import psutil
 
 # Local imports
 from .function_wrapper import wrapped_func
 from .other import timedelta_nice_format
+from .other import rtnsd
 
 LOGGER = logging.getLogger(__name__)
 
@@ -20,7 +23,7 @@ class OneProcess(object):
     """Class with object to handle all operations related to 1 process
     """
 
-    def __init__(self, str_dir_for_output):
+    def __init__(self, str_dir_for_output, str_proc_name=""):
         """"""
         self.str_dir_for_output = str_dir_for_output
         self.int_process_id = self._get_id_for_new_process()
@@ -31,6 +34,7 @@ class OneProcess(object):
         self.dt_finish_time = None
         self.is_error_happened = None
         self.str_status = "Not Started"
+        self.str_proc_name = str_proc_name
 
     def __del__(self):
         """Terminate current process"""
@@ -84,6 +88,28 @@ class OneProcess(object):
             return False
         self.str_status = "Running"
         return True
+
+    def get_pid(self):
+        """Get current process ID"""
+        if self.is_alive():
+            return self.process.pid
+        return None
+
+    def get_mem_usage(self):
+        """Get current process RAM memory usage string in nice format"""
+        process = psutil.Process(self.get_pid())
+        if not process:
+            return "None"
+        if sys.version_info[0] >= 3:
+            int_mem_bytes = process.memory_info().rss
+        else:
+            int_mem_bytes = process.memory_info()[0]
+        float_mem_mbytes = int_mem_bytes / 1024.0 / 1024.0
+        if float_mem_mbytes > 1024:
+            float_mem_gbytes = float_mem_mbytes / 1024.0
+            return str(rtnsd(float_mem_gbytes, 2)) + " Gb"
+        return str(rtnsd(float_mem_mbytes, 2)) + " Mb"
+
 
     def get_how_long_this_process_is_running(self):
         """Get string with duration this process is running"""

@@ -180,7 +180,8 @@ class JupyterProcessesManager(object):
     def print_table_with_conditions(self, int_max_processes_to_show=20):
         """Print table with processes conditions"""
         list_list_processes_info = []
-        list_headers = ["Process Id", "Status", "Runtime"]
+        list_headers = [
+            "Process Id", "Output Id", "Status", "Runtime", "RAM memory"]
         for process_num in list(self.dict_all_processes_by_id):
             list_process_info = []
             process_obj = self.dict_all_processes_by_id[process_num]
@@ -189,6 +190,8 @@ class JupyterProcessesManager(object):
                 if not process_obj.is_alive():
                     self.dict_alive_processes_by_id.pop(process_num, None)
             # "Process Id"
+            list_process_info.append(process_obj.get_pid())
+            # "Output Id"
             list_process_info.append(process_num)
             # "Status"
             list_process_info.append(process_obj.str_status)
@@ -196,6 +199,8 @@ class JupyterProcessesManager(object):
             str_runtime = process_obj.get_how_long_this_process_is_running()
             list_process_info.append(str_runtime)
             list_list_processes_info.append(list_process_info)
+            # "RAM memory"
+            list_process_info.append(process_obj.get_mem_usage())
         if len(list_list_processes_info) > int_max_processes_to_show:
             list_list_additional_columns = []
             list_list_additional_columns.append(["---", "---", "---"])
