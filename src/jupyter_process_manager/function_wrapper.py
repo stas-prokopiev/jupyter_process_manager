@@ -4,14 +4,25 @@ from __future__ import print_function
 import logging
 import sys
 import atexit
-# from contextlib import redirect_stdout, redirect_stderr
 
 # Third party imports
 from char import char
+from IPython.display import clear_output as clear_output_jupyter
 
 # Local imports
 
 DICT_STREAMS_STATE = {}
+
+
+
+
+def clear_output():
+    """"""
+    clear_output_jupyter()
+    if "stdout" in DICT_STREAMS_STATE:
+        if sys.stdout != DICT_STREAMS_STATE["stdout"]:
+            sys.stdout.truncate(0)
+
 
 def return_stdout_stderr_to_usual_state():
     """Return stdout and stderr back to the previous state"""
@@ -23,7 +34,6 @@ def return_stdout_stderr_to_usual_state():
         sys.stderr = DICT_STREAMS_STATE["stderr"]
 
 
-
 def redirect_all_stream_loggers(stdout_stream, stderr_stream):
     """"""
     dict_all_loggers = logging.Logger.manager.loggerDict
@@ -31,11 +41,25 @@ def redirect_all_stream_loggers(stdout_stream, stderr_stream):
         logger_tmp = dict_all_loggers[str_full_logger_name]
         if not hasattr(logger_tmp, "handlers"):
             continue
+        # print(str_full_logger_name)
         for handler_obj in logger_tmp.handlers:
             if isinstance(handler_obj, logging.StreamHandler):
-                if handler_obj.stream == DICT_STREAMS_STATE["stdout"]:
-                    handler_obj.stream = stdout_stream
-                if handler_obj.stream == DICT_STREAMS_STATE["stderr"]:
+                # print(dir(handler_obj))
+                # handler_obj.emit
+                # handler_obj.setStream
+                # handler_obj.stream
+                # print("---> Stream: ", handler_obj.stream)
+                # print("------> Name: ", handler_obj.stream.name)
+                # print("------> ", handler_obj.stream.name == "<stdout>")
+                # if handler_obj.stream == DICT_STREAMS_STATE["stdout"]:
+                if not hasattr(handler_obj, "stream"):
+                    continue
+                if not hasattr(handler_obj.stream, "name"):
+                    continue
+                if handler_obj.stream.name == "<stdout>":
+                    handler_obj.setStream(stdout_stream)
+                # if handler_obj.stream == DICT_STREAMS_STATE["stderr"]:
+                if handler_obj.stream.name == "<stderr>":
                     handler_obj.stream = stderr_stream
 
 
@@ -66,5 +90,6 @@ def wrapped_func(
         str_stdout_file,
         str_stderr_file,
     )
+    print("Test that jupyter_process_manager redirected stdout to file")
     func_to_process(*args, **kwargs)
     return_stdout_stderr_to_usual_state()

@@ -10,11 +10,13 @@ import datetime
 # Third party imports
 from local_simple_database import LocalSimpleDatabase
 import psutil
+from round_to_n_significant_digits import rtnsd
 
 # Local imports
 from .function_wrapper import wrapped_func
 from .other import timedelta_nice_format
-from .other import rtnsd
+
+
 
 LOGGER = logging.getLogger(__name__)
 

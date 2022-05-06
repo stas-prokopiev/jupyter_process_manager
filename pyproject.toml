@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "jupyter_process_manager"
+version = "0.1.12"
+description = "Python package with widget to simplify work with many processes in jupyter"
+authors = ["Stanislav Prokopyev <stas.prokopiev@gmail.com>"]
+license = "MIT"
+readme = "README.rst"
+repository = "https://github.com/stas-prokopiev/jupyter_process_manager"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+yaspin = "^2.1.0"
+tabulate = "^0.8.9"
+char = "^0.1.2"
+ipywidgets = "^7.7.0"
+local-simple-database = "^0.1.10"
+psutil = "^5.9.0"
+nest-asyncio = "^1.5.5"
+round-to-n-significant-digits = "^0.1.5"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.8"]
+build-backend = "poetry.core.masonry.api"

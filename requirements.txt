@@ -5,3 +5,4 @@ char
 ipywidgets
 local_simple_database
 psutil
+nest_asyncio

@@ -7,13 +7,15 @@
 from jupyter_process_manager.class_processes_manager import \
     JupyterProcessesManager
 from . import logger
+from .function_wrapper import clear_output
 
 
 JupyterProcessManager = JupyterProcessesManager
 JPM = JupyterProcessesManager
 
 
-__all__ = ["JupyterProcessesManager", "JupyterProcessManager", "JPM"]
+__all__ = [
+    "JupyterProcessesManager", "JupyterProcessManager", "JPM", "clear_output"]
 
 # Create LOGGER for current project
 logger.initialize_project_logger(

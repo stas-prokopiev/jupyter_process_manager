@@ -6,6 +6,9 @@ import logging
 from collections import OrderedDict
 from time import sleep
 import datetime
+import asyncio
+import nest_asyncio
+nest_asyncio.apply()
 
 # Third party imports
 from IPython.display import clear_output
@@ -42,11 +45,10 @@ class JupyterProcessesManager(object):
         """
         self.int_processes = 0
         # Create directory where to store processes output
-        str_processes_output_dir = os.path.join(
+        self.str_dir_for_output = os.path.join(
             str_dir_for_output, "processes_output")
-        if not os.path.exists(str_processes_output_dir):
-            os.makedirs(str_processes_output_dir)
-        self.str_dir_for_output = str_processes_output_dir
+        if not os.path.exists(self.str_dir_for_output):
+            os.makedirs(self.str_dir_for_output)
         if is_to_delete_previous_outputs:
             self._delete_all_previous_outputs()
         self.dict_all_processes_by_id = OrderedDict()
@@ -149,11 +151,15 @@ class JupyterProcessesManager(object):
                     break
                 for _ in range(int_seconds_step):
                     sleep(0.2)
-                    get_ipython().kernel.do_one_iteration()
+                    asyncio.run(get_ipython().kernel.do_one_iteration())
+                    # await get_ipython().kernel.do_one_iteration()
                 widget.OUTPUT_PROCESSES_CONDITIONS.clear_output(wait=True)
                 with widget.OUTPUT_PROCESSES_CONDITIONS:
                     self.print_info_about_running_processes(
                         int_max_processes_to_show=int_max_processes_to_show)
+
+
+
         except KeyboardInterrupt:
             clear_output(wait=True)
             print("Interrupting running processes")
