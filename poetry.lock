@@ -292,6 +292,17 @@ widgetsnbextension = ">=3.6.0,<3.7.0"
 test = ["pytest (>=3.6.0)", "pytest-cov", "mock"]
 
 [[package]]
+name = "ipywidgets-toggle-buttons"
+version = "0.2.3"
+description = "PYPI package with better toggle buttons"
+category = "main"
+optional = false
+python-versions = ">=3.6,<4.0"
+
+[package.dependencies]
+ipywidgets = ">=7.6.3,<8.0.0"
+
+[[package]]
 name = "jedi"
 version = "0.18.1"
 description = "An autocompletion tool for Python that can be used for text editors."
@@ -785,6 +796,14 @@ tornado = ">=4"
 test = ["pytest"]
 
 [[package]]
+name = "timedelta-nice-format"
+version = "0.1.0"
+description = "PYPI package with 2 functions to convert datetime.timedelta into string with nice format"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[[package]]
 name = "tinycss2"
 version = "1.1.1"
 description = "A tiny CSS parser"
@@ -879,7 +898,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "10525c999e613e7636f4a57d06a8a84191bb43ed6ef84e09c6a8a06d31ef6883"
+content-hash = "afa844ed7b6b8ad02b724be44c937c2286f037ffaa8f94baad3f777e7ca49ce2"
 
 [metadata.files]
 appnope = [
@@ -1052,6 +1071,10 @@ ipython-genutils = [
 ipywidgets = [
     {file = "ipywidgets-7.7.0-py2.py3-none-any.whl", hash = "sha256:e58ff58bc94d481e91ecb6e13a5cb96a87b6b8ade135e055603d0ca24593df38"},
     {file = "ipywidgets-7.7.0.tar.gz", hash = "sha256:ab4a5596855a88b83761921c768707d65e5847068139bc1729ddfe834703542a"},
+]
+ipywidgets-toggle-buttons = [
+    {file = "ipywidgets_toggle_buttons-0.2.3-py3-none-any.whl", hash = "sha256:7a6d9dd6417b48587644da747a65d025a36dc2450a6af4bb0db08451875f35d9"},
+    {file = "ipywidgets_toggle_buttons-0.2.3.tar.gz", hash = "sha256:9e393e4d22356d803d0e350d22e0ab525ead9d3d41bb03e0f43007b1353f73d7"},
 ]
 jedi = [
     {file = "jedi-0.18.1-py2.py3-none-any.whl", hash = "sha256:637c9635fcf47945ceb91cd7f320234a7be540ded6f3e99a50cb6febdfd1ba8d"},
@@ -1361,6 +1384,10 @@ termcolor = [
 terminado = [
     {file = "terminado-0.13.3-py3-none-any.whl", hash = "sha256:874d4ea3183536c1782d13c7c91342ef0cf4e5ee1d53633029cbc972c8760bd8"},
     {file = "terminado-0.13.3.tar.gz", hash = "sha256:94d1cfab63525993f7d5c9b469a50a18d0cdf39435b59785715539dd41e36c0d"},
+]
+timedelta-nice-format = [
+    {file = "timedelta_nice_format-0.1.0-py3-none-any.whl", hash = "sha256:1257b3cd5d20e3d560884b3a8b6e4a5179b6a50a5aa4a9a44d92f6313f5a0c38"},
+    {file = "timedelta_nice_format-0.1.0.tar.gz", hash = "sha256:5f231a646f3f39df520bb30d1fcd279925b5726079f56be63ebb63f9329c6f4c"},
 ]
 tinycss2 = [
     {file = "tinycss2-1.1.1-py3-none-any.whl", hash = "sha256:fe794ceaadfe3cf3e686b22155d0da5780dd0e273471a51846d0a02bc204fec8"},

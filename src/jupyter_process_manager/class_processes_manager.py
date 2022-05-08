@@ -6,23 +6,20 @@ import logging
 from collections import OrderedDict
 from time import sleep
 import datetime
-import asyncio
-import nest_asyncio
-nest_asyncio.apply()
+import atexit
 
 # Third party imports
 from IPython.display import clear_output
 from IPython.display import display
-from IPython import get_ipython
 from IPython.display import HTML
 from tabulate import tabulate
 from yaspin import yaspin
 from char import char
+from timedelta_nice_format import timedelta_nice_format
 
 # Local imports
 from .class_one_process import OneProcess
-from .other import timedelta_nice_format
-from . import widget
+from .gui.widget import WidgetProcessesManager
 
 LOGGER = logging.getLogger(__name__)
 
@@ -54,6 +51,27 @@ class JupyterProcessesManager(object):
         self.dict_all_processes_by_id = OrderedDict()
         self.dict_alive_processes_by_id = OrderedDict()
         self.dt_processes_started_at = None
+        self.gui_widget = WidgetProcessesManager(self)
+        atexit.register(self.terminate_all_alive_processes)
+
+    def _ipython_display_(self):
+        """"""
+        style = """
+            <style>
+            .jupyter-widgets-output-area .output_scroll {
+                    height: unset !important;
+                    border-radius: unset !important;
+                    -webkit-box-shadow: unset !important;
+                    box-shadow: unset !important;
+                }
+                .jupyter-widgets-output-area  {
+                    height: auto !important;
+                }
+            </style>
+            """
+        display(HTML(style))
+        display(self.gui_widget)
+
 
     @char
     def add_function_to_processing(self, func_to_process, *args, **kwargs):
@@ -68,6 +86,7 @@ class JupyterProcessesManager(object):
             self.dt_processes_started_at = datetime.datetime.now()
         self.dict_all_processes_by_id[new_process.int_process_id] = new_process
         self.dict_alive_processes_by_id[new_process.int_process_id] = new_process
+        self.gui_widget.update_widget()
 
     @char
     def debug_run_of_1_function(self, func_to_process, *args, **kwargs):
@@ -125,47 +144,17 @@ class JupyterProcessesManager(object):
             if not process_obj.is_alive():
                 self.dict_alive_processes_by_id.pop(process_num, None)
                 print("------> Done")
-
-    @char
-    def show_jupyter_widget(
-            self,
-            int_seconds_step=10,
-            int_max_processes_to_show=20
-    ):
-        """Show jupyter widget to interact with running processes
-
-        Args:
-            int_seconds_step (int,): Seconds to update processes info
-            int_max_processes_to_show (int): \
-                Max number of processes to show at once in the table
-        """
-        clear_output(wait=True)
-        app_gui = widget.create_jupyter_widget(self)
-        display(app_gui)
-        with widget.OUTPUT_PROCESSES_CONDITIONS:
-            self.print_info_about_running_processes(
-                int_max_processes_to_show=int_max_processes_to_show)
-        try:
-            while True:
-                if not self.dict_alive_processes_by_id:
-                    break
-                for _ in range(int_seconds_step):
-                    sleep(0.2)
-                    asyncio.run(get_ipython().kernel.do_one_iteration())
-                    # await get_ipython().kernel.do_one_iteration()
-                widget.OUTPUT_PROCESSES_CONDITIONS.clear_output(wait=True)
-                with widget.OUTPUT_PROCESSES_CONDITIONS:
-                    self.print_info_about_running_processes(
-                        int_max_processes_to_show=int_max_processes_to_show)
+        self.gui_widget.update_widget()
 
 
 
-        except KeyboardInterrupt:
-            clear_output(wait=True)
-            print("Interrupting running processes")
-            self.terminate_all_alive_processes()
-            print("---> Done")
-        print("All processes were finished")
+
+
+
+
+
+
+
 
     @char
     def print_info_about_running_processes(self, int_max_processes_to_show=20):
@@ -175,7 +164,7 @@ class JupyterProcessesManager(object):
         if self.dt_processes_started_at:
             timedelta = datetime.datetime.now() - self.dt_processes_started_at
             print("Working for:", timedelta_nice_format(timedelta))
-        self.print_table_with_conditions(
+        self._print_table_with_conditions(
             int_max_processes_to_show=int_max_processes_to_show)
         print(
             "ALIVE PROCESSES: ",
@@ -183,7 +172,7 @@ class JupyterProcessesManager(object):
             len(self.dict_all_processes_by_id))
 
     @char
-    def print_table_with_conditions(self, int_max_processes_to_show=20):
+    def _print_table_with_conditions(self, int_max_processes_to_show=20):
         """Print table with processes conditions"""
         list_list_processes_info = []
         list_headers = [
@@ -206,7 +195,12 @@ class JupyterProcessesManager(object):
             list_process_info.append(str_runtime)
             list_list_processes_info.append(list_process_info)
             # "RAM memory"
+
+
             list_process_info.append(process_obj.get_mem_usage())
+
+
+
         if len(list_list_processes_info) > int_max_processes_to_show:
             list_list_additional_columns = []
             list_list_additional_columns.append(["---", "---", "---"])

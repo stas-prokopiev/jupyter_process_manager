@@ -6,15 +6,17 @@ import os
 import logging
 from multiprocessing import Process
 import datetime
+import signal
+import time
 
 # Third party imports
 from local_simple_database import LocalSimpleDatabase
 import psutil
 from round_to_n_significant_digits import rtnsd
+from timedelta_nice_format import timedelta_nice_format
 
 # Local imports
 from .function_wrapper import wrapped_func
-from .other import timedelta_nice_format
 
 
 
@@ -31,6 +33,8 @@ class OneProcess(object):
         self.int_process_id = self._get_id_for_new_process()
         self.str_stdout_file, self.str_stderr_file = \
             self._create_files_for_stdout_and_stderr()
+        self.str_jpm_stderr_file = self.str_stderr_file.replace(
+            "stderr_", "jpm_stderr_")
         self.process = None
         self.dt_start_time = None
         self.dt_finish_time = None
@@ -52,7 +56,11 @@ class OneProcess(object):
 
         """
         new_args = (
-            self.str_stdout_file, self.str_stderr_file, func_to_process) + args
+            self.str_stdout_file,
+            self.str_stderr_file,
+            self.str_jpm_stderr_file,
+            func_to_process
+        ) + args
         new_process = Process(target=wrapped_func, args=new_args, kwargs=kwargs)
         new_process.daemon = True
         new_process.start()
@@ -99,6 +107,8 @@ class OneProcess(object):
 
     def get_mem_usage(self):
         """Get current process RAM memory usage string in nice format"""
+        if self.dt_finish_time:
+            return "None"
         process = psutil.Process(self.get_pid())
         if not process:
             return "None"
@@ -124,26 +134,35 @@ class OneProcess(object):
         """Get string with full STDOUT output of the process"""
         if not self.str_stdout_file:
             return ""
+        if not os.path.exists(self.str_stdout_file):
+            return "ERROR: NO FILE with STDOUT"
         with open(self.str_stdout_file, "r") as file_handler:
             str_whole_stdout_file = file_handler.read()
         return str_whole_stdout_file
 
-    def get_last_n_lines_of_stdout(self, int_last_lines=100):
+    def get_stdout(self):
         """Get last N line of STDOUT output of the process"""
         str_whole_output = self.get_full_process_output()
         list_lines = str_whole_output.splitlines()
         if not list_lines:
             return "STDOUT OUTPUT IS EMPTY"
-        if len(list_lines) < int_last_lines:
-            return str_whole_output
-        return "\n".join(list_lines[-int_last_lines:])
+        return str_whole_output
 
     def terminate(self):
         """Terminate current process"""
         if self.process.is_alive():
-            LOGGER.debug(
-                "Closing procees %d", self.int_process_id, flush=True)
-            self.process.terminate()
+            LOGGER.info("Closing procees %d", self.int_process_id)
+            LOGGER.info("---> Try to close the process nicely")
+            with open(self.str_jpm_stderr_file, "w") as f:
+                f.write("Stop process by JupyterProcessManager")
+            for _ in range(50):
+                time.sleep(0.1)
+                if not self.process.is_alive():
+                    LOGGER.info("------> Process was finished nicely. Hooray")
+                    break
+            else:
+                LOGGER.info("---> Terminate the process rough")
+                self.process.terminate()
             self.str_status = "Terminated by user"
             self.dt_finish_time = datetime.datetime.now()
 

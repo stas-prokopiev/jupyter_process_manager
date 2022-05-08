@@ -1,9 +1,14 @@
 """Decorators and wrappers to redirect streams for processes"""
 from __future__ import print_function
 # Standard library imports
+import os
 import logging
 import sys
 import atexit
+import threading
+from functools import partial
+import time
+import _thread
 
 # Third party imports
 from char import char
@@ -12,8 +17,6 @@ from IPython.display import clear_output as clear_output_jupyter
 # Local imports
 
 DICT_STREAMS_STATE = {}
-
-
 
 
 def clear_output():
@@ -77,10 +80,23 @@ def redirect_stdout_stderr_to_files(
     atexit.register(return_stdout_stderr_to_usual_state)
 
 
+def listen_to_jpm_error_file(str_jpm_stderr_file):
+    """"""
+    while True:
+        time.sleep(1)
+        if not os.path.exists(str_jpm_stderr_file):
+            continue
+        with open(str_jpm_stderr_file, "r") as f:
+            content = f.read()
+            if content:
+                _thread.interrupt_main()
+
+
 @char
 def wrapped_func(
         str_stdout_file,
         str_stderr_file,
+        str_jpm_stderr_file,
         func_to_process,
         *args,
         **kwargs
@@ -90,6 +106,10 @@ def wrapped_func(
         str_stdout_file,
         str_stderr_file,
     )
+    threading.Thread(
+        target=partial(listen_to_jpm_error_file, str_jpm_stderr_file),
+        daemon=True,
+    ).start()
     print("Test that jupyter_process_manager redirected stdout to file")
     func_to_process(*args, **kwargs)
     return_stdout_stderr_to_usual_state()
