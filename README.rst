@@ -39,76 +39,84 @@ Installation via pip:
 Usage examples
 ===================================================================
 
-| Lets say that you want to run some function defined in file **test_function.py**
-| with different arguments as separate processes and have control over them.
-
-
-.. code-block:: python
-
-    # In the file test_function.py
-    def test_just_wait(int_seconds, test_msg=""):
-        if test_msg:
-            print(test_msg)
-        for int_num in range(int_seconds):
-            print(int_num)
-            sleep(1)
-
-Then to run it you just need to do the following:
+How to create create and start processes for **jupyter_process_manager**
+-------------------------------------------------------------------------------------
 
 .. code-block:: python
 
-    from jupyter_process_manager import JPM
-    # OR from jupyter_process_manager import JupyterProcessManager
-    from .test_function import test_just_wait
-    # Create an object which will be handling processes
-    process_manager = JPM(".")
+    from jupyter_process_manager import JupyterProcessManager
+    process_manager = JupyterProcessManager(".")  # "." - path where to store outputs of the processes
 
-    for seconds_to_wait in range(5, 30, 5):
-        process_manager.add_function_to_processing(
-            test_just_wait,
-            seconds_to_wait,
-            test_msg="hi" * seconds_to_wait
-        )
-
-All the processes were started and now you can check what is happening with them
+    # And functions for processing
+    process_manager.add_function_to_processing(
+        func1, *func1_args,**func1_kwargs)
+    process_manager.add_function_to_processing(
+        func2, *func2_args,**func2_kwargs)
 
 **WARNING: Please do NOT try to use functions defined inside jupyter notebook, they won't work.**
 
-Show processes output as widget
---------------------------------------------------------------------------------------------------
+JupyterProcessManager arguments:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#. **str_dir_for_output**: Directory where to store processes outputs
+#. **is_to_delete_previous_outputs=True**: Flag If you want to delete outputs for all previous processes in the directory
+
+
+
+Usage in Jupyter Notebook
+------------------------------------------------------------
+
+After processes were added, you can check what is happening with them
 
 .. code-block:: python
 
-    process_manager.show_jupyter_widget(
-        int_seconds_step=2,
-        int_max_processes_to_show=20
-    )
+    process_manager
 
 .. image:: images/2.PNG
 
-JPM arguments
---------------------------------------------------------------------------------------------------
+How to check output for the processes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-#. **str_dir_for_output**: Directory where to store processes output
-#. **is_to_delete_previous_outputs=True**: Flag If you want to delete outputs for all previous processes in the directory
+| Select the process for which you want to see the output.
+| Select which output you want to see.
+| The output will get updated every 2 seconds.
 
-Usual print output
---------------------------------------------------------------------------------------------------
+How to add more processes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+| You can add as many processes as you want
+| by running the code below in any other jupyter notebook cell
 
 .. code-block:: python
 
-    process_manager.wait_till_all_processes_are_over(int_seconds_step=2)
+    process_manager.add_function_to_processing(
+        func_new, *func_new_args,**func_new_kwargs)
 
-.. image:: images/1.PNG
+How to stop a process
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To stop the process, select it and press the orange button to stop it
 
+| When the button to stop the selected process is pushed.
+| KeyboardInterrupt Exception is called for the process
+| If within 5 seconds process is not finished then the process will be killed.
 
-How to Debug
---------------------------------------------------------------------------------------------------
+How to do a debug run without a new process creation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
     # arguments are the same as in **add_function_to_processing(...)**
     process_manager.debug_run_of_1_function(func_to_process, *args, **kwargs)
+
+Usage in a console
+============================
+
+.. code-block:: python
+
+    process_manager.wait_till_all_processes_are_over()
+
+You will see the output like shown below
+
+.. image:: images/1.PNG
 
 Links
 =====

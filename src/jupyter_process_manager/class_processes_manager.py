@@ -1,6 +1,7 @@
 """Main module with class which helps in handing many processes"""
 from __future__ import print_function
 # Standard library imports
+from typing import Optional, Any, Union, Callable
 import os
 import logging
 from collections import OrderedDict
@@ -19,7 +20,6 @@ from timedelta_nice_format import timedelta_nice_format
 
 # Local imports
 from .class_one_process import OneProcess
-from .gui.widget import WidgetProcessesManager
 
 LOGGER = logging.getLogger(__name__)
 
@@ -30,9 +30,9 @@ class JupyterProcessesManager(object):
     @char
     def __init__(
             self,
-            str_dir_for_output,
-            is_to_delete_previous_outputs=True
-    ):
+            str_dir_for_output : str,
+            is_to_delete_previous_outputs : bool = True
+    ) -> None:
         """Initialize object
 
         Args:
@@ -51,10 +51,11 @@ class JupyterProcessesManager(object):
         self.dict_all_processes_by_id = OrderedDict()
         self.dict_alive_processes_by_id = OrderedDict()
         self.dt_processes_started_at = None
+        from .gui.widget import WidgetProcessesManager
         self.gui_widget = WidgetProcessesManager(self)
         atexit.register(self.terminate_all_alive_processes)
 
-    def _ipython_display_(self):
+    def _ipython_display_(self) -> None:
         """"""
         style = """
             <style>
@@ -74,7 +75,12 @@ class JupyterProcessesManager(object):
 
 
     @char
-    def add_function_to_processing(self, func_to_process, *args, **kwargs):
+    def add_function_to_processing(
+            self,
+            func_to_process : Callable,
+            *args : Any,
+            **kwargs : Any
+    ) -> None:
         """Start running function as process
 
         Args:
@@ -89,7 +95,12 @@ class JupyterProcessesManager(object):
         self.gui_widget.update_widget()
 
     @char
-    def debug_run_of_1_function(self, func_to_process, *args, **kwargs):
+    def debug_run_of_1_function(
+            self,
+            func_to_process : Callable,
+            *args : Any,
+            **kwargs : Any
+    ) -> None:
         """
         Run given function in the current process to check that it is runnable
         """
@@ -101,9 +112,9 @@ class JupyterProcessesManager(object):
     @char
     def wait_till_all_processes_are_over(
             self,
-            int_seconds_step=10,
-            int_max_processes_to_show=20
-    ):
+            int_seconds_step : Union[int, float] = 10,
+            int_max_processes_to_show : int = 20
+    ) -> None:
         """Wait while processes are running and print information during it
 
         Args:
@@ -134,7 +145,7 @@ class JupyterProcessesManager(object):
         print("All processes were finished")
 
     @char
-    def terminate_all_alive_processes(self):
+    def terminate_all_alive_processes(self) -> None:
         """Terminate all alive processes"""
         print("Terminating all alive processes")
         for process_num in list(self.dict_alive_processes_by_id):
@@ -146,18 +157,11 @@ class JupyterProcessesManager(object):
                 print("------> Done")
         self.gui_widget.update_widget()
 
-
-
-
-
-
-
-
-
-
-
     @char
-    def print_info_about_running_processes(self, int_max_processes_to_show=20):
+    def print_info_about_running_processes(
+            self,
+            int_max_processes_to_show : int = 20
+    ) -> None:
         """Print information string about current processes"""
         display(HTML("<h2>Processes conditions:</h2>"))
         # print("Conditions of the processes:")
@@ -172,7 +176,10 @@ class JupyterProcessesManager(object):
             len(self.dict_all_processes_by_id))
 
     @char
-    def _print_table_with_conditions(self, int_max_processes_to_show=20):
+    def _print_table_with_conditions(
+            self,
+            int_max_processes_to_show : int = 20
+    ) -> None:
         """Print table with processes conditions"""
         list_list_processes_info = []
         list_headers = [
@@ -195,12 +202,7 @@ class JupyterProcessesManager(object):
             list_process_info.append(str_runtime)
             list_list_processes_info.append(list_process_info)
             # "RAM memory"
-
-
             list_process_info.append(process_obj.get_mem_usage())
-
-
-
         if len(list_list_processes_info) > int_max_processes_to_show:
             list_list_additional_columns = []
             list_list_additional_columns.append(["---", "---", "---"])
@@ -215,7 +217,7 @@ class JupyterProcessesManager(object):
         print(tabulate(
             list_list_processes_info, headers=list_headers, tablefmt="pretty"))
 
-    def _delete_all_previous_outputs(self):
+    def _delete_all_previous_outputs(self) -> None:
         """Delete outputs of all previous processes"""
         for str_filename in os.listdir(self.str_dir_for_output):
             str_file_path = os.path.join(self.str_dir_for_output, str_filename)

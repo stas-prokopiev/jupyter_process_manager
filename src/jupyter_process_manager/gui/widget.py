@@ -1,6 +1,7 @@
 """Module with functions to handle all ipywidget stuff"""
 from __future__ import print_function
 # Standard library imports
+from typing import Optional, Any, Union
 import time
 import threading
 
@@ -13,11 +14,12 @@ from ipywidgets_toggle_buttons import ToggleButtonsAutoSize
 # Local imports
 from .layouts import MAIN_VBOX_LAYOUT
 from .layouts import HBOX_LAYOUT
+from ..class_processes_manager import JupyterProcessesManager
 
 
 class WidgetProcessesManager(VBox):
 
-    def __init__(self, process_manager_obj):
+    def __init__(self, process_manager_obj : JupyterProcessesManager) -> None:
         """
         Widgets to interact with running processes
 
@@ -34,7 +36,7 @@ class WidgetProcessesManager(VBox):
         ).start()
         self._is_to_update_output = True
 
-    def init_all_widgets(self):
+    def init_all_widgets(self) -> None:
         """"""
         self.OUTPUT_PROCESSES_CONDITIONS = ipywidgets.Output()
         self.OUTPUT = ipywidgets.Output()
@@ -65,9 +67,7 @@ class WidgetProcessesManager(VBox):
         self.VBOX_CHOOSE_PROCESS = VBox()
         self.VBOX_MAIN_GUI = VBox(layout=MAIN_VBOX_LAYOUT)
 
-
-
-    def create_widget(self):
+    def create_widget(self) -> None:
         """"""
         self.init_all_widgets()
         # Main GUI
@@ -80,8 +80,7 @@ class WidgetProcessesManager(VBox):
         self.children = list_hboxes
         self.update_widget()
 
-
-    def create_vbox_main_gui(self):
+    def create_vbox_main_gui(self) -> None:
         """"""
         list_hboxes_main = []
         # OUTPUT_PROCESSES_CONDITIONS
@@ -109,12 +108,12 @@ class WidgetProcessesManager(VBox):
 
         self.VBOX_MAIN_GUI.children = list_hboxes_main
 
-    def update_widget(self):
+    def update_widget(self) -> None:
         """"""
         self.update_choose_process()
         self.update_button_process_to_stop()
 
-    def update_choose_process(self, *_):
+    def update_choose_process(self, *_) -> None:
         """"""
         self.BUTTONS_CHOOSE_PROCESS.options = list(
             self.process_manager_obj.dict_all_processes_by_id)
@@ -123,7 +122,7 @@ class WidgetProcessesManager(VBox):
         self.BUTTONS_CHOOSE_PROCESS.observe(
             self._update_output, names='value')
 
-    def update_button_process_to_stop(self, *_):
+    def update_button_process_to_stop(self, *_) -> None:
         """"""
         self.button_stop_process._click_handlers.callbacks = []
         int_chosen_process = self.BUTTONS_CHOOSE_PROCESS.value
@@ -139,8 +138,9 @@ class WidgetProcessesManager(VBox):
             self._is_to_update_output = True
         else:
             self.button_stop_process.disabled = True
+        return None
 
-    def _create_vbox_choose_process(self):
+    def _create_vbox_choose_process(self) -> None:
         """Create all widgets starting from choose process
         """
         list_hboxes = []
@@ -153,7 +153,7 @@ class WidgetProcessesManager(VBox):
             HBox([self.BUTTONS_CHOOSE_PROCESS], layout=HBOX_LAYOUT))
         self.VBOX_CHOOSE_PROCESS.children = list_hboxes
 
-    def _update_output(self, *_, clear_output_at_first=True):
+    def _update_output(self, *_, clear_output_at_first :bool = True) -> None:
         """"""
         if clear_output_at_first:
             self.OUTPUT.clear_output(wait=True)
@@ -167,7 +167,7 @@ class WidgetProcessesManager(VBox):
         else:
             raise ValueError(f"Wrong value of output type: {output_type}")
 
-    def _on_click_stop_all_processes(self, *_):
+    def _on_click_stop_all_processes(self, *_) -> None:
         """"""
         self.OUTPUT.clear_output(wait=True)
         with self.OUTPUT:
@@ -177,7 +177,7 @@ class WidgetProcessesManager(VBox):
         self.update_button_process_to_stop()
         self._is_to_update_output = False
 
-    def _on_click_stop_process(self, _):
+    def _on_click_stop_process(self, *_) -> None:
         """"""
         self._is_to_update_output = False
         self.OUTPUT.clear_output(wait=True)
@@ -195,7 +195,7 @@ class WidgetProcessesManager(VBox):
         self.update_button_process_to_stop()
         # self._is_to_update_output = False
 
-    def _show_stdout(self, *_):
+    def _show_stdout(self, *_) -> None:
         """"""
         int_chosen_process = self.BUTTONS_CHOOSE_PROCESS.value
         process_obj = \
@@ -205,7 +205,7 @@ class WidgetProcessesManager(VBox):
             print("STDOUT:")
             print(str_output)
 
-    def _show_last_error(self, *_):
+    def _show_last_error(self, *_) -> None:
         """"""
         int_chosen_process = self.BUTTONS_CHOOSE_PROCESS.value
         process_obj = \
@@ -219,7 +219,7 @@ class WidgetProcessesManager(VBox):
                 print("Last error message: ")
                 print(str_last_error)
 
-    def _show_all_errors(self, *_):
+    def _show_all_errors(self, *_) -> None:
         """"""
         int_chosen_process = self.BUTTONS_CHOOSE_PROCESS.value
         process_obj = \
@@ -233,8 +233,7 @@ class WidgetProcessesManager(VBox):
                 print("ERROR:", error_num)
                 print(error_text)
 
-
-    def _start_thread_auto_output_update(self):
+    def _start_thread_auto_output_update(self) -> None:
         """"""
         while True:
             time.sleep(1)
