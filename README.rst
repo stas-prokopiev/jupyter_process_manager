@@ -66,13 +66,16 @@ JupyterProcessManager arguments:
 Usage in Jupyter Notebook
 ------------------------------------------------------------
 
-After processes were added, you can check what is happening with them
+After processes were added, you can check what is happening with them.
 
 .. code-block:: python
 
     process_manager
 
+Showing the JupyterProcessManager widget won't block execution so you can run the code in other cells
+
 .. image:: images/2.PNG
+
 
 How to check output for the processes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
