@@ -162,16 +162,20 @@ class OneProcess(object):
         """Terminate current process"""
         if self.process.is_alive():
             LOGGER.info("Closing procees %d", self.int_process_id)
-            LOGGER.info("---> Try to close the process nicely")
+            LOGGER.info(
+                "---> Try to close the process by raising KeyboardInterupt")
             with open(self.str_jpm_stderr_file, "w") as f:
                 f.write("Stop process by JupyterProcessManager")
             for _ in range(50):
                 time.sleep(0.1)
                 if not self.process.is_alive():
-                    LOGGER.info("------> Process was finished nicely. Hooray")
+                    LOGGER.info("------> Process was stopped.")
                     break
             else:
-                LOGGER.info("---> Terminate the process rough")
+                LOGGER.info(
+                    "------> Process HASN'T stopped by KeyboardInterupt.")
+                LOGGER.info(
+                    "---> Terminate the process by telling OS to kill it")
                 self.process.terminate()
             self.str_status = "Terminated by user"
             self.dt_finish_time = datetime.datetime.now()

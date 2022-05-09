@@ -61,8 +61,6 @@ JupyterProcessManager arguments:
 #. **str_dir_for_output**: Directory where to store processes outputs
 #. **is_to_delete_previous_outputs=True**: Flag If you want to delete outputs for all previous processes in the directory
 
-
-
 Usage in Jupyter Notebook
 ------------------------------------------------------------
 
