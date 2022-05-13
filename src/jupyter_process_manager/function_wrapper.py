@@ -73,9 +73,11 @@ def redirect_stdout_stderr_to_files(
 ) -> None:
     """Return stdout and stderr to the files"""
     DICT_STREAMS_PREV_STATE["stdout"] = sys.stdout
-    sys.stdout = open(str_stdout_file, "w", buffering=1)
+    # sys.stdout = open(str_stdout_file, "w", buffering=1)
+    sys.stdout = open(str_stdout_file, "r+", buffering=1)
     DICT_STREAMS_PREV_STATE["stderr"] = sys.stderr
-    sys.stderr = open(str_stderr_file, 'w', buffering=1)
+    # sys.stderr = open(str_stderr_file, 'w', buffering=1)
+    sys.stderr = open(str_stderr_file, 'r+', buffering=1)
     redirect_all_stream_loggers(sys.stdout, sys.stderr)
     atexit.register(return_stdout_stderr_to_usual_state)
 
