@@ -108,6 +108,26 @@ How to do a debug run without a new process creation
     # arguments are the same as in **add_function_to_processing(...)**
     process_manager.debug_run_of_1_function(func_to_process, *args, **kwargs)
 
+
+Other methods available within running processes for JPM
+------------------------------------------------------------
+
+Clear **stdout** output from the process
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+    from jupyter_process_manager import clear_output
+    clear_output()
+
+Get **stdout** output for the process
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+    from jupyter_process_manager import read_stdout
+    stdout_content = read_stdout()
+
 Usage in a console
 ============================
 

@@ -17,25 +17,31 @@ from IPython.display import clear_output as clear_output_jupyter
 
 # Local imports
 
-DICT_STREAMS_STATE = {}
+DICT_STREAMS_PREV_STATE = {}
 
 
 def clear_output() -> None:
     """"""
     clear_output_jupyter()
-    if "stdout" in DICT_STREAMS_STATE:
-        if sys.stdout != DICT_STREAMS_STATE["stdout"]:
+    if "stdout" in DICT_STREAMS_PREV_STATE:
+        if sys.stdout != DICT_STREAMS_PREV_STATE["stdout"]:
             sys.stdout.truncate(0)
+
+
+def read_stdout() -> str:
+    """"""
+    sys.stdout.seek(0)  # jump to the start
+    return sys.stdout.read()
 
 
 def return_stdout_stderr_to_usual_state() -> None:
     """Return stdout and stderr back to the previous state"""
-    if sys.stdout != DICT_STREAMS_STATE["stdout"]:
+    if sys.stdout != DICT_STREAMS_PREV_STATE["stdout"]:
         sys.stdout.close()
-        sys.stdout = DICT_STREAMS_STATE["stdout"]
-    if sys.stderr != DICT_STREAMS_STATE["stderr"]:
+        sys.stdout = DICT_STREAMS_PREV_STATE["stdout"]
+    if sys.stderr != DICT_STREAMS_PREV_STATE["stderr"]:
         sys.stderr.close()
-        sys.stderr = DICT_STREAMS_STATE["stderr"]
+        sys.stderr = DICT_STREAMS_PREV_STATE["stderr"]
 
 
 def redirect_all_stream_loggers(
@@ -66,9 +72,9 @@ def redirect_stdout_stderr_to_files(
         str_stderr_file : str,
 ) -> None:
     """Return stdout and stderr to the files"""
-    DICT_STREAMS_STATE["stdout"] = sys.stdout
+    DICT_STREAMS_PREV_STATE["stdout"] = sys.stdout
     sys.stdout = open(str_stdout_file, "w", buffering=1)
-    DICT_STREAMS_STATE["stderr"] = sys.stderr
+    DICT_STREAMS_PREV_STATE["stderr"] = sys.stderr
     sys.stderr = open(str_stderr_file, 'w', buffering=1)
     redirect_all_stream_loggers(sys.stdout, sys.stderr)
     atexit.register(return_stdout_stderr_to_usual_state)
