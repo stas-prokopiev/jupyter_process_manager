@@ -41,6 +41,9 @@ class OneProcess(object):
         self.str_jpm_stderr_file = os.path.join(
             self.str_dir_for_output, "jpm_stderr_%d.txt" % self.int_process_id)
 
+        with open(self.str_stdout_file, "w"): pass
+        with open(self.str_stderr_file, "w"): pass
+
 
         self.process = None
         self.dt_start_time = None
@@ -144,13 +147,13 @@ class OneProcess(object):
             return timedelta_nice_format(self.dt_finish_time - self.dt_start_time)
         return timedelta_nice_format(datetime.datetime.now() - self.dt_start_time)
 
-
     def get_stdout(self) -> str:
         """Get last N line of STDOUT output of the process"""
         if not self.str_stdout_file:
             return "ERROR: Path to file with stdout is not given"
         if not os.path.exists(self.str_stdout_file):
-            return "ERROR: NO FILE with STDOUT"
+            with open(self.str_stdout_file, "w"): pass
+            return "STDOUT OUTPUT IS EMPTY"
         with open(self.str_stdout_file, "r") as file_handler:
             str_whole_output = file_handler.read()
         list_lines = str_whole_output.splitlines()
