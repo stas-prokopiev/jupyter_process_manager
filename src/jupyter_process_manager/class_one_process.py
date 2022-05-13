@@ -186,11 +186,13 @@ class OneProcess(object):
     def get_list_all_errors(self) -> list[str]:
         """Get list with all ERRORs from STDERR"""
         if not self.str_stderr_file:
-            return ""
+            return []
+        if not os.path.exists(self.str_stderr_file):
+            return []
         with open(self.str_stderr_file, "r") as file_handler:
             str_whole_stderr_file = file_handler.read()
         if not str_whole_stderr_file:
-            return "STDERR OUTPUT IS EMPTY"
+            return []
         list_errors = str_whole_stderr_file.split("Traceback ")
         if len(list_errors) <= 1:
             return []
