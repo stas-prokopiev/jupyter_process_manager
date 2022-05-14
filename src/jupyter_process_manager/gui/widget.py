@@ -202,7 +202,7 @@ class WidgetProcessesManager(VBox):
             self.process_manager_obj.dict_all_processes_by_id[int_chosen_process]
         str_output = process_obj.get_stdout()
         with self.OUTPUT:
-            print("STDOUT:", len(str_output))
+            # print("STDOUT:")
             print(str_output.strip())
 
     def _show_last_error(self, *_) -> None:
