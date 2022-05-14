@@ -25,6 +25,7 @@ def clear_output() -> None:
     clear_output_jupyter()
     if "stdout" in DICT_STREAMS_PREV_STATE:
         if sys.stdout != DICT_STREAMS_PREV_STATE["stdout"]:
+            sys.stdout.seek(0)
             sys.stdout.truncate(0)
 
 
