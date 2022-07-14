@@ -94,6 +94,29 @@ class JupyterProcessesManager(object):
         self.dict_alive_processes_by_id[new_process.int_process_id] = new_process
         self.gui_widget.update_widget()
 
+    # @char
+    # def remove_process(
+    #         self,
+    #         func_to_process : Callable,
+    #         *args : Any,
+    #         **kwargs : Any
+    # ) -> None:
+    #     """Start running function as process
+
+    #     Args:
+    #         func_to_process (function): Function to add for processing
+    #     """
+    #     new_process = OneProcess(self.str_dir_for_output)
+    #     new_process.start_process(func_to_process, *args, **kwargs)
+    #     if not self.dict_alive_processes_by_id:
+    #         self.dt_processes_started_at = datetime.datetime.now()
+    #     self.dict_all_processes_by_id[new_process.int_process_id] = new_process
+    #     self.dict_alive_processes_by_id[new_process.int_process_id] = new_process
+    #     self.gui_widget.update_widget()
+
+
+
+
     @char
     def debug_run_of_1_function(
             self,
@@ -165,11 +188,15 @@ class JupyterProcessesManager(object):
         """Print information string about current processes"""
         display(HTML("<h2>Processes conditions:</h2>"))
         # print("Conditions of the processes:")
-        if self.dt_processes_started_at:
+        if self.dt_processes_started_at is not None:
             timedelta = datetime.datetime.now() - self.dt_processes_started_at
             print("Working for:", timedelta_nice_format(timedelta))
+
+
         self._print_table_with_conditions(
             int_max_processes_to_show=int_max_processes_to_show)
+
+
         print(
             "ALIVE PROCESSES: ",
             len(self.dict_alive_processes_by_id), "/",
@@ -188,9 +215,12 @@ class JupyterProcessesManager(object):
             list_process_info = []
             process_obj = self.dict_all_processes_by_id[process_num]
             # Delete if process is not alive
-            if process_num in list(self.dict_alive_processes_by_id):
+            if process_num in self.dict_alive_processes_by_id:
                 if not process_obj.is_alive():
                     self.dict_alive_processes_by_id.pop(process_num, None)
+
+
+
             # "Process Id"
             list_process_info.append(process_obj.get_pid())
             # "Output Id"
@@ -214,8 +244,11 @@ class JupyterProcessesManager(object):
             list_list_processes_info = \
                 list_list_additional_columns + list_list_processes_info[:20]
         # github  psql  orgtbl  pretty
-        print(tabulate(
-            list_list_processes_info, headers=list_headers, tablefmt="pretty"))
+        if list_list_processes_info:
+            print(tabulate(
+                list_list_processes_info, headers=list_headers, tablefmt="pretty"))
+        else:
+            print("No Processes started yet")
 
     def _delete_all_previous_outputs(self) -> None:
         """Delete outputs of all previous processes"""

@@ -53,6 +53,15 @@ class WidgetProcessesManager(VBox):
             button_style='warning',
             layout={"width": "200px"}
         )
+
+        self.button_remove_process = ipywidgets.Button(
+            description='Remove process',
+            button_style='warning',
+            layout={"width": "200px"},
+            diasbled=True,
+        )
+
+
         self.togbut_select_what_to_show = ToggleButtonsAutoSize(
             options=["Show process STDOUT", "Show LAST ERROR", "Show ALL ERRORs"])
         self.togbut_select_what_to_show.observe(
@@ -91,7 +100,11 @@ class WidgetProcessesManager(VBox):
         list_hboxes_main.append(self.VBOX_CHOOSE_PROCESS)
         # Stop ALL Processes
         list_hboxes_main.append(
-            HBox([self.button_stop_process, self.button_stop_all_processes],
+            HBox([
+                self.button_stop_process,
+                self.button_stop_all_processes,
+                self.button_remove_process
+            ],
             layout=HBOX_LAYOUT))
         list_hboxes_main.append(
             HBox(
@@ -125,6 +138,7 @@ class WidgetProcessesManager(VBox):
     def update_button_process_to_stop(self, *_) -> None:
         """"""
         self.button_stop_process._click_handlers.callbacks = []
+        self.button_remove_process._click_handlers.callbacks = []
         int_chosen_process = self.BUTTONS_CHOOSE_PROCESS.value
         if int_chosen_process is None:
             return None
@@ -132,12 +146,18 @@ class WidgetProcessesManager(VBox):
             self.process_manager_obj.dict_all_processes_by_id[int_chosen_process]
         self.button_stop_process.description = \
             f'STOP {int_chosen_process} process'
+        self.button_remove_process.description = \
+            f'REMOVE {int_chosen_process} process'
+
         if process_obj.is_alive():
             self.button_stop_process.disabled = False
+            self.button_remove_process.disabled = True
             self.button_stop_process.on_click(self._on_click_stop_process)
             self._is_to_update_output = True
         else:
             self.button_stop_process.disabled = True
+            self.button_remove_process.disabled = False
+            self.button_remove_process.on_click(self._on_click_remove_process)
         return None
 
     def _create_vbox_choose_process(self) -> None:
@@ -182,6 +202,11 @@ class WidgetProcessesManager(VBox):
         self._is_to_update_output = False
         self.OUTPUT.clear_output(wait=True)
         int_chosen_process = self.BUTTONS_CHOOSE_PROCESS.value
+
+        if int_chosen_process is None:
+            return None
+
+
         process_obj = \
             self.process_manager_obj.dict_all_processes_by_id[int_chosen_process]
 
@@ -195,9 +220,27 @@ class WidgetProcessesManager(VBox):
         self.update_button_process_to_stop()
         # self._is_to_update_output = False
 
+
+    def _on_click_remove_process(self, *_) -> None:
+        """"""
+        self._is_to_update_output = False
+        self.OUTPUT.clear_output(wait=True)
+        int_chosen_process = self.BUTTONS_CHOOSE_PROCESS.value
+        self.process_manager_obj.dict_all_processes_by_id.pop(
+            int_chosen_process, None)
+
+
     def _show_stdout(self, *_) -> None:
         """"""
         int_chosen_process = self.BUTTONS_CHOOSE_PROCESS.value
+
+
+        if int_chosen_process is None:
+            with self.OUTPUT:
+                print("No alive processes to show output")
+            return None
+
+
         process_obj = \
             self.process_manager_obj.dict_all_processes_by_id[int_chosen_process]
         str_output = process_obj.get_stdout()
@@ -208,6 +251,14 @@ class WidgetProcessesManager(VBox):
     def _show_last_error(self, *_) -> None:
         """"""
         int_chosen_process = self.BUTTONS_CHOOSE_PROCESS.value
+
+
+        if int_chosen_process is None:
+            with self.OUTPUT:
+                print("No alive processes to show output")
+            return None
+
+
         process_obj = \
             self.process_manager_obj.dict_all_processes_by_id[int_chosen_process]
         int_errors_happened = len(process_obj.get_list_all_errors())
@@ -222,6 +273,10 @@ class WidgetProcessesManager(VBox):
     def _show_all_errors(self, *_) -> None:
         """"""
         int_chosen_process = self.BUTTONS_CHOOSE_PROCESS.value
+        if int_chosen_process is None:
+            with self.OUTPUT:
+                print("No alive processes to show output")
+            return None
         process_obj = \
             self.process_manager_obj.dict_all_processes_by_id[int_chosen_process]
         all_errors = process_obj.get_list_all_errors()
